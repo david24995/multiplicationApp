@@ -1,5 +1,7 @@
 import yargs from 'yargs';
+
 import { hideBin } from 'yargs/helpers';
+import { isANumber, isPositiveNumber } from '../helpers/validation.helper';
 
 export const yarg = yargs(hideBin(process.argv))
   .option('b', {
@@ -33,8 +35,8 @@ export const yarg = yargs(hideBin(process.argv))
     desc: 'File destination',
   })
   .check((argv, options) => {
-    if (argv.b < 1) throw 'Error: base must be greater than 0';
-    if (isNaN(argv.b)) throw 'Error: base needs to be a number type';
+    isPositiveNumber(argv.b);
+    isANumber(argv.b);
 
     return true;
   })

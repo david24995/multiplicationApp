@@ -4,7 +4,7 @@ import { SaveFile } from './save-file.use-case';
 
 describe('SaveFileUseCase', () => {
   afterEach(() => {
-    fs.rmSync('outputs', { recursive: true });
+    if (fs.existsSync('outputs')) fs.rmSync('outputs', { recursive: true });
   });
 
   it('should saveFile with default values', () => {
@@ -25,7 +25,25 @@ describe('SaveFileUseCase', () => {
     expect(fnSpyOnWrite).toHaveBeenCalled();
   });
 
-  it('should saveFile have called an error', async () => {
+  it('should return error if directory could not be created', () => {
+    const saveFile = new SaveFile();
+    const options = {
+      fileContent: 'Test content',
+    };
+
+    const fnSpyOnMk = jest.spyOn(fs, 'mkdirSync').mockImplementation(() => {
+      throw new Error('Error en generar el directorio');
+    });
+
+    const result = saveFile.execute(options);
+
+    expect(result).toBeFalsy();
+    expect(fnSpyOnMk).toHaveBeenCalled();
+
+    fnSpyOnMk.mockRestore();
+  });
+
+  it('should return error if file could not be created', () => {
     const saveFile = new SaveFile();
     const options = {
       fileContent: 'Test content',
@@ -39,5 +57,6 @@ describe('SaveFileUseCase', () => {
 
     expect(result).toBeFalsy();
     expect(fnSpyOnMk).toHaveBeenCalled();
+    fnSpyOnMk.mockRestore();
   });
 });
